@@ -1,5 +1,6 @@
-Flask
 Werkzeug
-tensorflow-cpu==2.12
+Flask
+tensorflow-cpu==2.12.0
 numpy
-Pillow
+requests
+

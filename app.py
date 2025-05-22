@@ -1,34 +1,36 @@
 from flask import Flask, render_template, request, jsonify
 import os
+import requests
 from werkzeug.utils import secure_filename
 import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input
-import requests
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure the upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Define model path and (optional) download URL
-model_path = "modelLast2_save.keras"
-model_url = "https://drive.google.com/file/d/16zAOYXQUYFvBZazWrEITPcTDFcdKC0TC/view?usp=sharing"  # Replace with real link
+# Model configuration
+MODEL_PATH = "model.keras"
+MODEL_URL = "https://drive.google.com/uc?export=download&id=16zAOYXQUYFvBZazWrEITPcTDFcdKC0TC"  # <-- Replace with actual public URL
 
-# Download the model if it's missing
-if not os.path.exists(model_path):
-    print("Model not found. Downloading...")
-    response = requests.get(model_url)
-    with open(model_path, "wb") as f:
+# Download model if not present
+if not os.path.exists(MODEL_PATH):
+    print("Downloading model from URL...")
+    response = requests.get(MODEL_URL)
+    with open(MODEL_PATH, "wb") as f:
         f.write(response.content)
-    print("Model downloaded successfully.")
+    print("Model downloaded.")
 
-# Load model
-model = load_model(model_path)
+# Load Keras model
+model = load_model(MODEL_PATH)
 
 # Define class labels
-class_labels = ['CNV', 'DME', 'Drusen', 'Normal', 'not an oct image']
+class_labels = ['CNV', 'DME', 'Drusen', 'Normal', "not an oct image"]
 
 @app.route('/')
 def home():
@@ -55,7 +57,7 @@ def predict():
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(file_path)
 
-    # Preprocess image
+    # Load and preprocess image
     img = image.load_img(file_path, target_size=(224, 224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
@@ -71,5 +73,5 @@ def predict():
     })
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 7860))
     app.run(host='0.0.0.0', port=port, debug=True)
