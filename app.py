@@ -8,14 +8,14 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'mysite/static/uploads'
+UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Ensure the upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Model configuration
-MODEL_PATH = "model.keras"
+MODEL_PATH = "modelLast2_save.keras"
 MODEL_URL = "https://drive.google.com/uc?export=download&id=16zAOYXQUYFvBZazWrEITPcTDFcdKC0TC"  # <-- Replace with actual public URL
 
 # Download model if not present
@@ -73,5 +73,4 @@ def predict():
     })
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 7860))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True)
